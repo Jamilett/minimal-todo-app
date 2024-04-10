@@ -1,11 +1,15 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import TodoList from "../components/TodoList";
+import ToDoList from "../components/ToDoList";
 import { todosData } from "../data/todos";
+import { useNavigation } from "@react-navigation/native"
 
 export default function Home() {
 
-  const imgURL = 'https://cdn4.iconfinder.com/data/icons/logos-3/600/React.js_logo-512.png';
+  // Hook: acceder a una pantalla (Screen) desde cualquier parte de la app
+  const navigation = useNavigation();
+
+  const ImgURL = 'https://cdn4.iconfinder.com/data/icons/logos-3/600/React.js_logo-512.png';
 
   const [sortedData, setSortedData] = React.useState(
     todosData.sort((a, b) => a.isCompleted - b.isCompleted) // Ordenar primero por los completados
@@ -24,19 +28,19 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: imgURL }} style={styles.img} />
+      <Image source={{ uri: ImgURL }} style={styles.img} />
       <View style={styles.todayContainer}>
         <Text style={styles.title}> Today </Text>
         <TouchableOpacity onPress={handleHidePress}>
           <Text style={{ color: '#3478f6' }}> {isHidden ? 'Show completed' : 'Hide completed'} </Text>
         </TouchableOpacity>
       </View>
-      <TodoList todosData={sortedData.filter(({ isToday }) => isToday)} />
+      <ToDoList todosData={sortedData.filter(({ isToday }) => isToday)} />
 
       <Text style={styles.title}> Tomorrow </Text>
-      <TodoList todosData={todosData.filter(({ isToday }) => isToday)} />
+      <ToDoList todosData={todosData.filter(({ isToday }) => isToday)} />
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity onPress={() => navigation.navigate("Add")} style={styles.button}>
         <Text style={styles.plus}> + </Text>
       </TouchableOpacity>
     </View>
