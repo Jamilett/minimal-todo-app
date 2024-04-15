@@ -1,23 +1,49 @@
+import { Entypo } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as React from "react";
 import {
   StyleSheet,
-  Text,
-  View,
-  FlatList,
   TouchableOpacity,
+  View
 } from "react-native";
-import { Entypo } from "@expo/vector-icons";
+import { useDispatch, useSelector } from 'react-redux';
+import { updateToDoReducer } from '../redux/todosSlice';
 
 export default function Checkbox({ id, isCompleted, isToday, text, hour }) {
-  
+
+  const dispatch = useDispatch();
+
+  const listToDos = useSelector(state => state.toDos.toDos);
+  const handleCheckBox = () => {
+    try {
+      dispatch(updateToDoReducer({ id, isCompleted })); // Se ejecuta la acción
+      AsyncStorage.setItem("@ToDos", JSON.stringify(
+        // Se setearán solo los cambios de la tarea seleccionada
+        listToDos.map(toDo => {
+          if (toDo.id === id) {
+            return {
+              ...toDo,
+              isCompleted: !toDo.isCompleted
+            }
+          }
+          return toDo;
+        }
+        )
+      ));
+      console.warn('isCompleted saved');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   return isToday ? (
-    <TouchableOpacity style={isCompleted ? style.checked : style.unChecked}>
+    <TouchableOpacity onPress={handleCheckBox} style={isCompleted ? style.checked : style.unChecked}>
       {isCompleted && <Entypo name="check" size={16} color="#FAFAFA" />}
     </TouchableOpacity>
   ) : (
     <View style={style.isToday} />
   );
-  
+
 }
 
 // Estilos dependiendo el estado del check
