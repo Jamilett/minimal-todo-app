@@ -8,8 +8,6 @@ import { addToDoReducer } from '../redux/todosSlice';
 
 export default function AddToDo() {
 
-  // Async guardar en local
-
   // Useselector: acceder al estado
   const listToDos = useSelector(state => state.toDos.toDos);
   // useDispatch: usar los reducers creados en el Slice
@@ -31,6 +29,7 @@ export default function AddToDo() {
     }
 
     try {
+      // Async guardar en local
       await AsyncStorage.setItem("@ToDos", JSON.stringify([...listToDos, newToDo]));
       // Dejarle saber a redux que acabamos de agregar un ToDo
       dispatch(addToDoReducer(newToDo));

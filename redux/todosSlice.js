@@ -10,7 +10,7 @@ export const toDosSlice = createSlice({
   reducers: { // funciones que manejarán los datos del estado
     setToDosReducer: (state, action) => { // state = initialState o estado actual
       state.toDos = action.payload;
-      console.log(state.toDos);
+      console.log(state.toDos, 'state actual');
     },
     addToDoReducer: (state, action) => {
       state.toDos.push(action.payload);
