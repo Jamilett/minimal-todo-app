@@ -4,7 +4,7 @@ import * as React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from 'react-redux';
 import ToDoList from "../components/ToDoList";
-import { setToDosReducer } from "../redux/todosSlice";
+import { setToDosReducer, hideCompletedReducer } from "../redux/todosSlice";
 
 export default function Home() {
 
@@ -36,14 +36,17 @@ export default function Home() {
   // );
 
   const [isHidden, setIsHidden] = React.useState(false); // Mostar/Ocultar completados
-  const handleHidePress = () => {
-    // if (isHidden) {
-    //   setIsHidden(false);
-    //   setSortedData(todosData.sort((a, b) => a.isCompleted - b.isCompleted));
-    //   return;
-    // }
-    // setIsHidden(!isHidden);
-    // setSortedData(sortedData.filter(({ isCompleted }) => !isCompleted));
+  const handleHidePress = async () => {
+    if (isHidden) {
+      setIsHidden(false);
+      const listToDos = await AsyncStorage.getItem("@ToDos");
+      if (listToDos) {
+        dispatch(setToDosReducer(JSON.parse(listToDos)))
+      }
+      return;
+    }
+    setIsHidden(true);
+    dispatch(hideCompletedReducer())
   }
 
   return (
