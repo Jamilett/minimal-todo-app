@@ -1,29 +1,49 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useDispatch, useSelector } from 'react-redux';
 import ToDoList from "../components/ToDoList";
-import { todosData } from "../data/todos";
-import { useNavigation } from "@react-navigation/native"
+import { setToDosReducer } from "../redux/todosSlice";
 
 export default function Home() {
 
+  const dispatch = useDispatch();
+
+  const listToDos = useSelector(state => state.toDos.toDos);
+  // Acceder a los to dos del storage
+  React.useEffect(() => {
+    const getToDos = async () => {
+      try {
+        const toDos = await AsyncStorage.getItem("@ToDos");
+        if (toDos !== null) {
+          dispatch(setToDosReducer(JSON.parse(toDos)))
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    getToDos();
+  }, []); // Con el [] solo se ejecutará una vez 
+
   // Hook: acceder a una pantalla (Screen) desde cualquier parte de la app
   const navigation = useNavigation();
-
   const ImgURL = 'https://cdn4.iconfinder.com/data/icons/logos-3/600/React.js_logo-512.png';
 
-  const [sortedData, setSortedData] = React.useState(
-    todosData.sort((a, b) => a.isCompleted - b.isCompleted) // Ordenar primero por los completados
-  );
+  // const [sortedData, setSortedData] = React.useState(
+  //   todosData.sort((a, b) => a.isCompleted - b.isCompleted) // Ordenar primero por los completados
+  // );
 
   const [isHidden, setIsHidden] = React.useState(false); // Mostar/Ocultar completados
   const handleHidePress = () => {
-    if (isHidden) {
-      setIsHidden(false);
-      setSortedData(todosData.sort((a, b) => a.isCompleted - b.isCompleted));
-      return;
-    }
-    setIsHidden(!isHidden);
-    setSortedData(sortedData.filter(({ isCompleted }) => !isCompleted));
+    // if (isHidden) {
+    //   setIsHidden(false);
+    //   setSortedData(todosData.sort((a, b) => a.isCompleted - b.isCompleted));
+    //   return;
+    // }
+    // setIsHidden(!isHidden);
+    // setSortedData(sortedData.filter(({ isCompleted }) => !isCompleted));
   }
 
   return (
@@ -35,10 +55,10 @@ export default function Home() {
           <Text style={{ color: '#3478f6' }}> {isHidden ? 'Show completed' : 'Hide completed'} </Text>
         </TouchableOpacity>
       </View>
-      <ToDoList todosData={sortedData.filter(({ isToday }) => isToday)} />
+      <ToDoList todosData={listToDos.filter(({ isToday }) => isToday)} />
 
       <Text style={styles.title}> Tomorrow </Text>
-      <ToDoList todosData={todosData.filter(({ isToday }) => isToday)} />
+      <ToDoList todosData={listToDos.filter(({ isToday }) => !isToday)} />
 
       <TouchableOpacity onPress={() => navigation.navigate("Add")} style={styles.button}>
         <Text style={styles.plus}> + </Text>

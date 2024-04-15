@@ -1,8 +1,10 @@
 import * as React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Checkbox from "./Checkbox";
+import moment from "moment"
 
 export default function Todo({ id, text, isCompleted, isToday, hour }) {
+  const [localHour, setLocalHour] = React.useState(new Date(hour));
   return (
     <View style={styles.container}>
       <Checkbox
@@ -35,7 +37,8 @@ export default function Todo({ id, text, isCompleted, isToday, hour }) {
               : styles.hour
           }
         >
-          {hour}
+          {/* Formatear a hora */}
+          {moment(localHour).format('LT')}
         </Text>
       </View>
     </View>

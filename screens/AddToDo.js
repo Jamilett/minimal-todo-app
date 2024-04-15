@@ -1,12 +1,46 @@
-import * as React from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Image, StyleSheet, Text, TouchableOpacity, View, TextInput, Switch } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+import * as React from "react";
+import { StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useDispatch, useSelector } from 'react-redux';
+import { addToDoReducer } from '../redux/todosSlice';
 
 export default function AddToDo() {
+
+  // Async guardar en local
+
+  // Useselector: acceder al estado
+  const listToDos = useSelector(state => state.toDos.toDos);
+  // useDispatch: usar los reducers creados en el Slice
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
   const [name, setName] = React.useState('');
   const [date, setDate] = React.useState(new Date());
   const [isToday, setIsToday] = React.useState(false);
 
+
+  const addToDo = async () => {
+    const newToDo = {
+      id: Math.floor(Math.random() * 1000000),
+      text: name,
+      hour: date.toString(),
+      isToday: isToday,
+      isCompleted: false
+    }
+
+    try {
+      await AsyncStorage.setItem("@ToDos", JSON.stringify([...listToDos, newToDo]));
+      // Dejarle saber a redux que acabamos de agregar un ToDo
+      dispatch(addToDoReducer(newToDo));
+      console.log('To do saved correctly');
+      // Regresar a la página anterior
+      navigation.goBack();
+    } catch (e) {
+      console.error(e);
+    }
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}> Add Task </Text>
@@ -39,7 +73,7 @@ export default function AddToDo() {
         />
       </View>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={addToDo}>
         <Text style={{ color: 'white' }}> Done </Text>
       </TouchableOpacity>
       <Text style={{
